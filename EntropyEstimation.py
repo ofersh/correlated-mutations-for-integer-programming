@@ -230,11 +230,6 @@ def estimateKDE_entropy(data):
     print("Error: Singular matrix encountered. Consider adjusting bandwidth or using a different KDE implementation.")
     return None
 
-
-# # Example usage:
-# data = np.random.randn(1000)  # Generate random data
-# 
-
 def histogram_entropy_multivariate(data, bins=10):
     """
     Estimate entropy using a histogram-based method for multivariate data.
@@ -250,12 +245,6 @@ def histogram_entropy_multivariate(data, bins=10):
     probabilities = hist / np.sum(hist)  # Normalize to probabilities
     probabilities = probabilities[probabilities > 0]  # Ignore empty bins
     return entropy(probabilities, base=2)  # Base-2 entropy (bits)
-# # Example usage
-# np.random.seed(42)
-# data = np.random.multivariate_normal(mean=[0, 0], cov=[[1, 0.5], [0.5, 1]], size=1000)  # 2D Gaussian
-# hist_entropy = histogram_entropy_multivariate(data, bins=20)
-# print(f"Multivariate histogram-based entropy estimate: {hist_entropy:.4f} bits")
-
 
 def knn_entropy(sample, k=3):
     """
@@ -300,20 +289,7 @@ def knn_entropy(sample, k=3):
         - np.log(k)
     )
     return entropy
-    # nbrs = NearestNeighbors(n_neighbors=k+1).fit(sample)
-    # distances, _ = nbrs.kneighbors(sample)
-    # radius = distances[:, k]  # Distance to the k-th neighbor
-    # volume_unit_ball = np.pi ** (d / 2) / np.math.gamma(d / 2 + 1)  # Volume of unit ball in d-dimensions
-    # avg_log_radius = np.mean(np.log(radius))
-    # return d * (np.log(2) - avg_log_radius) + np.log(volume_unit_ball) + np.log(n - 1) - np.log(k)
-
-# # Example usage
-# np.random.seed(42)
-# sample = np.random.normal(loc=0, scale=1, size=(1000, 2))  # Bivariate normal distribution
-# knn_entropy_estimate = knn_entropy(sample, k=5)
-# print(f"kNN-based entropy estimate: {knn_entropy_estimate:.4f} bits")
-#
-
+    
 def estimateEntropy(data):
     # knn_entropy_estimate = knn_entropy(data, k=5)
     # print(f"kNN-based entropy estimate: {knn_entropy_estimate} bits")
@@ -321,88 +297,3 @@ def estimateEntropy(data):
     print(f"Multivariate histogram-based entropy estimate: {hist_entropy:.4f} bits")
     # estimated_entropy = estimateKDE_entropy(data)
     # print(estimated_entropy)
-    
-    
-# def estimate_entropy_2d(samples, method='scott', bandwidth=None):
-#     """
-#     Estimates the entropy of a 2D distribution.
-
-#     Args:
-#         samples: A NumPy array of shape (num_samples, 2) containing the samples.
-#         method: Method for determining bin width:
-#             - 'scott' (Scott's rule)
-#             - 'freedman' (Freedman-Diaconis rule)
-#             - 'kde' (Kernel Density Estimation)
-#             - 'auto' (selects between 'scott' and 'freedman' based on data)
-#         bandwidth: Bandwidth parameter for KDE. If None, uses Scott's rule.
-
-#     Returns:
-#         An estimate of the differential entropy of the distribution.
-#     """
-
-#     if method in ['scott', 'freedman', 'auto']:
-#         # Histogram-based estimation
-#         bins = _determine_bins(samples, method)
-#         hist, x_edges, y_edges = np.histogram2d(samples[:, 0], samples[:, 1], bins=bins, density=True)
-#         dx = x_edges[1] - x_edges[0]
-#         dy = y_edges[1] - y_edges[0]
-#         hist_flat = hist.flatten()
-#         hist_flat = hist_flat[hist_flat > 0]
-#         entropy_value = entropy(hist_flat, base=2)
-#         entropy_estimate = entropy_value - np.log2(dx * dy) 
-
-#     elif method == 'kde':
-#         # Kernel Density Estimation
-#         kd = kde.gaussian_kde(samples.T, bw_method=bandwidth)
-#         x_grid, y_grid = np.mgrid[-5:5:100j, -5:5:100j] 
-#         positions = np.vstack([x_grid.ravel(), y_grid.ravel()])
-#         pdf = np.reshape(kd(positions).T, x_grid.shape)
-#         dx = x_grid[0, 1] - x_grid[0, 0]
-#         dy = y_grid[1, 0] - y_grid[0, 0]
-#         entropy_estimate = -np.sum(pdf[pdf > 0] * np.log2(pdf[pdf > 0])) * dx * dy
-
-#     else:
-#         raise ValueError("Invalid 'method' argument. Choose from: 'scott', 'freedman', 'kde', 'auto'")
-
-#     return entropy_estimate
-
-# def _determine_bins(samples, method):
-#     """
-#     Determines the optimal number of bins for histogram-based entropy estimation.
-
-#     Args:
-#         samples: A NumPy array of shape (num_samples, 2) containing the samples.
-#         method: 'scott' or 'freedman' for bin width selection.
-
-#     Returns:
-#         A tuple (bins_x, bins_y) with the number of bins for each dimension.
-#     """
-#     range_x = np.ptp(samples[:, 0])
-#     range_y = np.ptp(samples[:, 1])
-#     if method == 'scott':
-#         bin_width_x = 3.5 * np.std(samples[:, 0]) * len(samples[:, 0])**(-1/3)
-#         bin_width_y = 3.5 * np.std(samples[:, 1]) * len(samples[:, 1])**(-1/3)
-#         bins_x = int(range_x / bin_width_x)
-#         bins_y = int(range_y / bin_width_y)
-#     elif method == 'freedman':
-#         iqr_x = np.percentile(samples[:, 0], 75) - np.percentile(samples[:, 0], 25)
-#         iqr_y = np.percentile(samples[:, 1], 75) - np.percentile(samples[:, 1], 25)
-#         bin_width_x = 2 * iqr_x / len(samples[:, 0])**(1/3)
-#         bin_width_y = 2 * iqr_y / len(samples[:, 1])**(1/3)
-#         bins_x = int(range_x / bin_width_x)  # Corrected line: Use range_x here
-#         bins_y = int(range_y / bin_width_y)
-#     elif method == 'auto':
-#         scott_bins = _determine_bins(samples, 'scott')
-#         freedman_bins = _determine_bins(samples, 'freedman')
-#         # Choose the method with a more reasonable number of bins
-#         if 5 <= min(scott_bins) <= 50 and 5 <= min(freedman_bins) <= 50:
-#             # Use Scott's rule if both methods give reasonable bin counts
-#             bins_x, bins_y = scott_bins
-#         elif 5 <= min(scott_bins) <= 50:
-#             # Use Scott's rule if it gives a reasonable bin count
-#             bins_x, bins_y = scott_bins
-#         else:
-#             # Use Freedman-Diaconis rule if Scott's rule gives unreasonable bin counts
-#             bins_x, bins_y = freedman_bins
-#     return bins_x, bins_y
-# #
